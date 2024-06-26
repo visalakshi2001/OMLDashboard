@@ -18,7 +18,7 @@ def dashfunc():
     top_columns = st.columns(2)
 
     with top_columns[0]:
-        programs = pd.read_csv("reports\TestPrograms.csv", index_col=0)
+        programs = pd.read_csv(r"reports\TestPrograms.csv", index_col=0)
 
         st.markdown("<h6>Scheduled Test Programs</h6>", True)
         metriccols = st.columns(4)
