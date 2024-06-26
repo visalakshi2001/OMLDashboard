@@ -1,5 +1,4 @@
 import streamlit as st
-from streamlit_echarts import st_echarts
 import plotly.express as px
 import pandas as pd
 import numpy as np
@@ -18,7 +17,7 @@ def dashfunc():
     top_columns = st.columns(2)
 
     with top_columns[0]:
-        programs = pd.read_csv("reports\TestPrograms.csv", index_col=0)
+        programs = pd.read_csv("reports/TestPrograms.csv", index_col=0)
 
         st.markdown("<h6>Scheduled Test Programs</h6>", True)
         metriccols = st.columns(4)
@@ -34,9 +33,9 @@ def dashfunc():
             st.error("MobilityDeploymentTest is colliding with other tests", icon="❗")
             st.error("AntennaDeploymentTest is colliding with other tests", icon="❗")
 
-    middle_columns = st.columns(2)
+    middle_columns = st.columns([0.7, 0.3])
     with middle_columns[0]:
-        tests = pd.read_csv("reports\TestProcedures.csv", index_col=0)
+        tests = pd.read_csv("reports/TestProcedures.csv", index_col=0)
         tests["datetime"] = pd.to_datetime(tests["datetime"])
         tests = set_datewise_color(tests)
         
@@ -45,7 +44,7 @@ def dashfunc():
                          )
         fig.update_layout(showlegend=False)
         
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
     
     with middle_columns[1]:
         st.markdown(
@@ -62,7 +61,7 @@ def dashfunc():
         tests["TestConf"] = [0.374540, 0.950714, 0.731994, 0.598658, 0.156019, 0.155995]
         st.markdown("<h6>Test Confidence Scores</h6>", True)
         for i, score in enumerate(tests["TestConf"]):
-            st.progress(value=score, text=tests.iloc[i]["Test"] + f"\n\t\t{score*100}%")
+            st.progress(value=score, text=tests.iloc[i]["Test"] + f"$~~~~~~~~~~~$ **{np.round(score*100, decimals=1)}%**")
         
         # st.dataframe(tests["TestConf"], 
         #              column_config = { "TestConf":
@@ -77,48 +76,3 @@ def dashfunc():
 
     # middle_cols = st.columns(1)
 
-
-# def plot1():
-    
-
-
-def treemaps():
-    df = pd.read_csv("reports\SystemArchitecture.csv", index_col=0)
-    data = {'Rover_System': [
-            {'Rover_Comms': {}}, 
-            {'Rover_Mobility': {}}
-        ]
-        }
-    option = {
-    "tooltip": {"trigger": "item", "triggerOn": "mousemove"},
-    "series": [
-        {
-            "type": "tree",
-            "data": [data],
-            "top": "1%",
-            "left": "7%",
-            "bottom": "1%",
-            "right": "20%",
-            "symbolSize": 7,
-            "label": {
-                "position": "left",
-                "verticalAlign": "middle",
-                "align": "right",
-                "fontSize": 9,
-            },
-            "leaves": {
-                "label": {
-                    "position": "right",
-                    "verticalAlign": "middle",
-                    "align": "left",
-                }
-            },
-            "emphasis": {"focus": "descendant"},
-            "expandAndCollapse": True,
-            "animationDuration": 550,
-            "animationDurationUpdate": 750,
-        }
-    ],
-}
-    st.dataframe(df)
-    st_echarts(options=option, height="500px")
