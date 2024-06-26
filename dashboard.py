@@ -18,6 +18,7 @@ def dashfunc():
 
     with top_columns[0]:
         programs = pd.read_csv("reports/TestPrograms.csv", index_col=0)
+        programs = pd.read_csv("reports/TestPrograms.csv", index_col=0)
 
         st.markdown("<h6>Scheduled Test Programs</h6>", True)
         metriccols = st.columns(4)
@@ -35,6 +36,7 @@ def dashfunc():
 
     middle_columns = st.columns([0.7, 0.3])
     with middle_columns[0]:
+        tests = pd.read_csv("reports/TestProcedures.csv", index_col=0)
         tests = pd.read_csv("reports/TestProcedures.csv", index_col=0)
         tests["datetime"] = pd.to_datetime(tests["datetime"])
         tests = set_datewise_color(tests)
