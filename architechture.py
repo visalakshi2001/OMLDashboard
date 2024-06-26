@@ -4,6 +4,9 @@ import numpy as np
 from streamlit_echarts import st_echarts
 import plotly.express as px
 
+def sysarcfunc()
+    pass
+
 def treemaps():
     df = pd.read_csv("reports/SystemArchitecture.csv", index_col=0)
     data = {'Rover_System': [
