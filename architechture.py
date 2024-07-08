@@ -9,10 +9,39 @@ import itertools
 
 def sysarcfunc():
 
-    top_cols = st.columns([3,1])
+    top_cols = st.columns([2.5,1.5])
 
     with top_cols[0]:
         systemarc_sankey("System Architechture")
+    
+    with top_cols[1]:
+        roles = pd.read_csv("reports/Responsibilities.csv", index_col=0)
+        resultsdocument = pd.read_csv("reports/DocumentSearch.csv", index_col=0)
+
+        st.markdown("<h6>Assigned Responsibilities</h6>", True)
+        st.dataframe(roles,hide_index=True)
+
+        st.markdown("<h6>Test Data Results</h6>", True)
+
+        metricchoice = st.selectbox("Select Test Data Document", options=["Payload Test Data Report"], index=0)
+
+        if metricchoice == "Payload Test Data Report":
+            metriccols = st.columns([1, 1.5, 1.5], gap="small") 
+            for index,row in resultsdocument.iterrows():
+                with metriccols[index]:
+                    value = str(row["Value"]) + " " + str(row["Unit"]) if (pd.isna(row["Unit"]) != True) else str(row["Value"])
+                    st.metric(label=row["TestData"], value=value, delta=row["TestDataSubject"], help="Test, followed by result value for given test subject")
+
+        st.write(
+            """
+            <style>
+            [data-testid="stMetricDelta"] svg {
+                display: none;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
 
 def systemarc_sankey(plot_title = "Graph of System Architechture"):
     system = pd.read_csv("reports/SystemArchitecture.csv", index_col=0)
@@ -77,8 +106,7 @@ def systemarc_sankey(plot_title = "Graph of System Architechture"):
                 label =  (df["source"] + " to " + df["target"]).tolist(),
                 customdata = df["customname"],
                 # color =  "rgba(30,30,30,.3)",
-                hovertemplate = "\n %{customdata}    \
-                                \n %{label}"
+                hovertemplate = "\n %{customdata} <br> %{label}"
             )
         )
     )

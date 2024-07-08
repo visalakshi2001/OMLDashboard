@@ -23,7 +23,7 @@ def dashfunc():
         st.markdown("<h6>Scheduled Test Programs</h6>", True)
         metriccols = st.columns(4)
         for i,num in enumerate(programs["num_Tests"]):
-            metriccols[i].metric(label=programs.iloc[i]["TestProgram"], value=num, delta=f"{num-2} Scheduled", delta_color="off")
+            metriccols[i].metric(label=programs.iloc[i]["TestProgram"], value=num, delta=f"{num-2} Scheduled")
 
     with top_columns[1]:
         st.markdown("<h6>Issues</h6>", True)
@@ -34,7 +34,7 @@ def dashfunc():
             st.error("MobilityDeploymentTest is colliding with other tests", icon="❗")
             st.error("AntennaDeploymentTest is colliding with other tests", icon="❗")
 
-    middle_columns = st.columns([0.7, 0.3])
+    middle_columns = st.columns([0.6, 0.4])
     with middle_columns[0]:
         tests = pd.read_csv("reports/TestProcedures.csv", index_col=0)
         tests = pd.read_csv("reports/TestProcedures.csv", index_col=0)
@@ -44,7 +44,10 @@ def dashfunc():
         fig = px.timeline(x_start=tests["datetime"], x_end=tests["datetime"] + timedelta(days=30), y = tests["Test"], 
                           title="Scheduled Test Programs", color=tests["color"], color_discrete_map=dict(zip(tests["color"], tests["color"])),
                          )
-        fig.update_layout(showlegend=False)
+        vlinedate = datetime.today().date()
+        fig.add_vline(x=datetime(vlinedate.year, vlinedate.month, vlinedate.day).timestamp() * 1000, annotation_text= f"today {vlinedate.month}/{vlinedate.day}")
+
+        fig.update_layout(showlegend=False, yaxis={'title': None, 'visible': True, 'showticklabels': True})
         
         st.plotly_chart(fig, use_container_width=True)
     
@@ -61,20 +64,21 @@ def dashfunc():
             unsafe_allow_html=True,
         )
         tests["TestConf"] = [0.374540, 0.950714, 0.731994, 0.598658, 0.156019, 0.155995]
+
         st.markdown("<h6>Test Confidence Scores</h6>", True)
-        for i, score in enumerate(tests["TestConf"]):
-            st.progress(value=score, text=tests.iloc[i]["Test"] + f"$~~~~~~~~~~~$ **{np.round(score*100, decimals=1)}%**")
+        # for i, score in enumerate(tests["TestConf"]):
+        #     st.progress(value=score, text=tests.iloc[i]["Test"] + f"$~~~~~~~~~~~$ **{np.round(score*100, decimals=1)}%**")
         
-        # st.dataframe(tests["TestConf"], 
-        #              column_config = { "TestConf":
-        #                  st.column_config.ProgressColumn("Test Confidence Scores", 
-        #                                                  help="Confidence scores for the scheduled tests", min_value=0.0, max_value=1.0,
-        #                                                  width="large"
-        #                                                  )
-        #                 },
-        #              hide_index=True,
-                     
-        #             )
+        st.dataframe(tests[["Test", "TestConf"]], 
+                     column_config = { "TestConf":
+                         st.column_config.ProgressColumn("Test Confidence Scores", 
+                                                         help="Confidence scores for the scheduled tests", min_value=0.0, max_value=1.0,
+                                                         width="large"
+                                                         )
+                        },
+                     hide_index=True,
+                     use_container_width=True,                     
+                    )
 
     # middle_cols = st.columns(1)
 
