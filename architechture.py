@@ -23,7 +23,7 @@ def sysarcfunc():
         system = pd.read_csv("reports/Query2_SystemArchitecture.csv", index_col=0)
         environment = pd.read_csv("reports/Environment.csv", index_col=0)
         mission = pd.read_csv("reports/Query1_MissionArchitecture.csv", index_col=0)
-        moe = pd.read_csv("reports\Query4_MOEs.csv", index_col=0)
+        moe = pd.read_csv("reports/Query4_MOEs.csv", index_col=0)
 
         graphchoice = st.selectbox("Select view", ["Functional Architechture", "System Architechture", "Missions",
                                                              "MOE", "Environments"],
