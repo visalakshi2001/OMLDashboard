@@ -6,13 +6,120 @@ import plotly.express as px
 import plotly.graph_objects as go
 import itertools
 
+import graphviz
+
+
+# seperate the relationship arrows by type or color
+# hide detectfault
+# python script checks the test conflicts and other conflicts
 
 def sysarcfunc():
 
     top_cols = st.columns([2.5,1.5])
 
     with top_cols[0]:
-        systemarc_sankey("System Architechture")
+        # systemarc_sankey("System Architechture")
+        function = pd.read_csv("reports/FunctionalArchitecture.csv", index_col=0)
+        system = pd.read_csv("reports/Query2_SystemArchitecture.csv", index_col=0)
+        environment = pd.read_csv("reports/Environment.csv", index_col=0)
+        mission = pd.read_csv("reports/Query1_MissionArchitecture.csv", index_col=0)
+        moe = pd.read_csv("reports\Query4_MOEs.csv", index_col=0)
+
+        graphchoice = st.selectbox("Select view", ["Functional Architechture", "System Architechture", "Missions",
+                                                             "MOE", "Environments"],
+                                   index=0)
+
+        dot = graphviz.Digraph(comment='Hierarchy', strict=True)
+        
+        if graphchoice == "Functional Architechture":
+            for index, row in function.iterrows():
+                func = row['Function']
+                super_func = row['SuperFunction']
+                allocated_to = row['AllocatedTo']
+                
+                # Add the function node
+                dot.node(func)
+                
+                # Add edge from SuperFunction to Function if SuperFunction exists
+                if pd.notna(super_func):
+                    dot.edge(func, super_func, arrowhead="diamond")
+                
+                # Add AllocatedTo node and edge if it doesn't already exist
+                if pd.notna(allocated_to):
+                    if allocated_to not in dot.body:
+                        dot.node(allocated_to, shape='box')
+                    dot.edge(func, allocated_to)
+            st.graphviz_chart(dot, True)
+        
+        elif graphchoice == "System Architechture":
+            for index, row in system.iterrows():
+                sys = row["SystemName"]
+                subsys = row["SubsystemName"]
+                subsubsys = row["SubsubsystemName"]
+
+                if pd.notna(sys):
+                    dot.node(sys)
+
+                if pd.notna(subsys):
+                    if subsys not in dot.body:
+                        dot.node(subsys)
+                    if pd.notna(sys):
+                        dot.edge(sys, subsys, label="has subsystem")
+                
+                if pd.notna(subsubsys):
+                    if subsubsys not in dot.body:
+                        dot.node(subsubsys, shape="box")
+                    if pd.notna(subsys):
+                        dot.edge(subsys, subsubsys, label="has subsubsystem")  
+            st.graphviz_chart(dot, True)
+        
+        elif graphchoice == "Environments":
+            for index, row in environment.iterrows():
+                mission = row["Mission"]
+                env = row["Environment"]
+                entity = row["EnvironmentalEntity"]
+
+                dot.node(mission)
+
+                if pd.notna(env):
+                    dot.edge(mission, env)
+                if pd.notna(entity):
+                    dot.edge(env, entity, arrowhead="diamond")
+            st.graphviz_chart(dot, True)
+        
+        elif graphchoice == "Missions":
+            for index, row in  mission.iterrows():
+                program = row["ProgramName"]
+                missname = row["MissionName"]
+                misscomp = row["MissionComponentName"]
+                subsys = row["SubsystemName"]
+
+                dot.node(program)
+
+                if pd.notna(missname):
+                    if missname not in dot.body:
+                        dot.node(missname, shape="box")
+                    dot.edge(program, missname, label="has mission")
+                if pd.notna(misscomp):
+                    dot.node(misscomp, shape="box")
+                    dot.edge(missname, misscomp, arrowhead="diamond", label="has component")
+                if pd.notna(subsys):
+                    dot.edge(misscomp, subsys, arrowhead="vee", label="has subsystem")
+            st.graphviz_chart(dot, True)
+        
+        elif graphchoice == "MOE":
+            for index, row in moe.iterrows():
+                missname = row["MissionName"]
+                moename = row["MOEName"]
+
+                dot.node(missname)
+
+                if pd.notna(moename):
+                    dot.edge(missname, moename, label="has moe")
+            st.graphviz_chart(dot, True)
+        
+        # st.dataframe(moe)
+
     
     with top_cols[1]:
         roles = pd.read_csv("reports/Responsibilities.csv", index_col=0)
@@ -43,119 +150,6 @@ def sysarcfunc():
             unsafe_allow_html=True,
         )
 
-def systemarc_sankey(plot_title = "Graph of System Architechture"):
-    system = pd.read_csv("reports/SystemArchitecture.csv", index_col=0)
-    function = pd.read_csv("reports/FunctionalArchitecture.csv", index_col=0)
-    mission = pd.read_csv("reports/Mission.csv", index_col=0)
-    missionenv = pd.read_csv("reports/Environment.csv", index_col=0)
 
-    dfs = [system, function.drop(columns=["SuperFunction"]), mission, missionenv]
-    customnames = ["System", "AssignedFunctions", "Mission", "Environment"]
 
-    links = []
-    name = 0
-    posx, posy = 1, 1
-    for df in dfs:
-        for prevcol, nextcol in itertools.combinations(df.columns, r=2):
-            links.extend([{"source": x, "target": y, "value": 1, "customname": customnames[name], "posx": posx/5, "posy": (posy := posy-.1)} 
-                          for x,y in zip(df[prevcol], df[nextcol]) if (pd.isna(x) or pd.isna(y)) != True])
-            posy = 1
-        name += 1
-        posx += 1
-        
-    
-    df = pd.DataFrame(links).drop_duplicates()
-    nodes = np.unique(df[["source","target"]], axis=None)
-    nodes = pd.Series(index=nodes, data=range(len(nodes)))
 
-    min_posx = {node: float('inf') for node in nodes.index}
-    min_posy = {node: float('inf') for node in nodes.index}
-    customnames = {node: "" for node in nodes.index}
-    for index, row in df.iterrows():
-        min_posx[row['source']] = min(min_posx[row['source']], row['posx'])
-        min_posx[row['target']] = min(min_posx[row['target']], row['posx'])
-
-        min_posy[row['source']] = min(min_posy[row['source']], row['posy'])
-        min_posy[row['target']] = min(min_posy[row['target']], row['posy'])
-
-        if customnames[row["source"]] == "":
-            customnames[row["source"]] = row["customname"]
-        if customnames[row["target"]] == "":
-            customnames[row["target"]] = row["customname"]
-
-    fig = go.Figure(
-        go.Sankey(
-            arrangement = "snap",
-            node = dict(
-                pad = 15,
-                thickness = 15,
-                line = dict(color = "black", width = 0.5),
-                label = nodes.index,
-                x = [min_posx[node] for node in nodes.index],
-                y = [min_posy[node] for node in nodes.index],
-                customdata = list(customnames.values()),
-                hovertemplate = "Belongs to %{customdata}",
-                # color = "blue",
-                align = "right"
-            ),
-            link = dict(
-                # arrowlen=15,
-                source =  nodes.loc[df["source"]],
-                target =  nodes.loc[df["target"]],
-                value =  df["value"],
-                label =  (df["source"] + " to " + df["target"]).tolist(),
-                customdata = df["customname"],
-                # color =  "rgba(30,30,30,.3)",
-                hovertemplate = "\n %{customdata} <br> %{label}"
-            )
-        )
-    )
-
-    fig.update_layout(
-        font_size=14,
-        title = plot_title,
-
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
-
-def treemaps():
-    df = pd.read_csv("reports/SystemArchitecture.csv", index_col=0)
-    data = {'Rover_System': [
-            {'Rover_Comms': {}}, 
-            {'Rover_Mobility': {}}
-        ]
-        }
-    option = {
-    "tooltip": {"trigger": "item", "triggerOn": "mousemove"},
-    "series": [
-        {
-            "type": "tree",
-            "data": [data],
-            "top": "1%",
-            "left": "7%",
-            "bottom": "1%",
-            "right": "20%",
-            "symbolSize": 7,
-            "label": {
-                "position": "left",
-                "verticalAlign": "middle",
-                "align": "right",
-                "fontSize": 9,
-            },
-            "leaves": {
-                "label": {
-                    "position": "right",
-                    "verticalAlign": "middle",
-                    "align": "left",
-                }
-            },
-            "emphasis": {"focus": "descendant"},
-            "expandAndCollapse": True,
-            "animationDuration": 550,
-            "animationDurationUpdate": 750,
-        }
-    ],
-}
-    st.dataframe(df)
-    st_echarts(options=option, height="500px")
