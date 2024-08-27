@@ -6,6 +6,9 @@ import numpy as np
 
 from datetime import datetime, timedelta
 
+from issues import issuesinfo
+
+COLORS = px.colors.qualitative.Plotly
 
 
 def set_datewise_color(df):
@@ -15,9 +18,7 @@ def set_datewise_color(df):
 
 def dashfunc():
 
-    COLORS = px.colors.qualitative.Plotly
-
-    st.subheader("Schedule", "Performance", divider="orange")
+    st.subheader("Schedule", divider="orange")
 
     top_columns = st.columns(2)
 
@@ -30,9 +31,7 @@ def dashfunc():
             metriccols[i].metric(label=programs.iloc[i]["TestProgram"], value=num, delta=f"{num-2} Scheduled")
 
     with top_columns[1]:
-        st.markdown("<h6>Issues</h6>", True)
-        with st.container(border=True, height=150):
-            st.warning('Four tests have overlapped scheduling (find more info on Issues tab)', icon="⚠️")
+        issuesinfo()
             
 
     middle_columns = st.columns([0.75, 0.25])
@@ -118,11 +117,47 @@ def dashfunc():
         #             )
 
 
+def dashresults():
     st.subheader("Performance", divider="violet")
 
-    middle_columns2 = st.columns([0.7, 0.3])
+    top_columns = st.columns([0.2,0.3,0.5])
 
-    with middle_columns2[0]:
+    with top_columns[2]:
+        issuesinfo()
+
+    with top_columns[0]:
+        roles = pd.read_csv("reports/Responsibilities.csv", index_col=0)
+        resultsdocument = pd.read_csv("reports/DocumentSearch.csv", index_col=0)
+
+        st.markdown("<h6>Assigned Responsibilities</h6>", True)
+        st.dataframe(roles,hide_index=True)
+
+    with top_columns[1]:
+        st.markdown("<h6>Test Data Results</h6>", True)
+
+        metricchoice = st.selectbox("Select Test Data Document", options=["Payload Test Data Report"], index=0)
+
+        if metricchoice == "Payload Test Data Report":
+            metriccols = st.columns([1, 1.5, 1.5], gap="small") 
+            for index,row in resultsdocument.iterrows():
+                with metriccols[index]:
+                    value = str(row["Value"]) + " " + str(row["Unit"]) if (pd.isna(row["Unit"]) != True) else str(row["Value"])
+                    st.metric(label=row["TestData"], value=value, delta=row["TestDataSubject"], help="Test, followed by result value for given test subject")
+
+        st.write(
+            """
+            <style>
+            [data-testid="stMetricDelta"] svg {
+                display: none;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    middle_columns = st.columns([0.7, 0.3])
+
+    with middle_columns[0]:
         keycaprates = pd.read_csv("reports/Query5_KeyCapabilities 2.csv", index_col=0)
         keycaprates["UnitSymbols"] = keycaprates["Unit"].map({"percent": "%", "degrees": "deg", "second": "sec", "kilogram": "kg"})
 
@@ -170,7 +205,7 @@ def dashfunc():
 
         st.plotly_chart(fig, use_container_width=True)
     
-    with middle_columns2[1]:
+    with middle_columns[1]:
         keycaprates["VerificationStatus"] = np.where(pd.notnull(keycaprates["VerificationMethodName"]),  "Verified", "Unverified")
         
         fig = go.Figure(data=[
@@ -261,6 +296,7 @@ def dashfunc():
     )
     st.plotly_chart(fig, True)
     # st.dataframe(decisionreview)
+
 
 
 ##########################################################################################################
