@@ -14,10 +14,10 @@ def sysissues():
         conflicts = st.expander("⚠️ Four tests have overlapping schedule", expanded=True)
 
         with conflicts:
-            st.error("TerrainTraversalExercise has potential schedule conflict with other tests", icon="❗")
-            st.error("PayloadDeploymentTest has potential schedule conflict with other tests", icon="❗")
-            st.error("MobilityDeploymentTest has potential schedule conflict with other tests", icon="❗")
-            st.error("AntennaDeploymentTest has potential schedule conflict with other tests", icon="❗")
+            st.error("Pathway Creation Time Test has potential schedule conflict with other tests", icon="❗")
+            st.error("Maneuvrability Test has potential schedule conflict with other tests", icon="❗")
+            st.error("Path Confidence Test has potential schedule conflict with other tests", icon="❗")
+            st.error("Information Loss Test has potential schedule conflict with other tests", icon="❗")
 
 def issuesinfo():
     st.markdown("<h6>Issues</h6>", True)
