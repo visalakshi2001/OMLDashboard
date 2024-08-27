@@ -1,17 +1,11 @@
 import streamlit as st
 import pandas as pd
-from dashboard import dashfunc
+from dashboard import dashfunc, dashresults
 from architechture import sysarcfunc
 from issues import sysissues
 
 
 st.set_page_config(page_title="Dashboard", page_icon="🍩", layout="wide")
-
-def sidebar(pages: list):
-    with st.sidebar:
-        page = st.radio("Navigation", pages)
-    
-    return page
 
 
 def main():
@@ -19,19 +13,16 @@ def main():
 
     st.header("🧮 Dashboard", divider="red")
 
-    page = sidebar(PAGES)
-
-    if page == PAGES[0]:
-        testtab, archtab = st.tabs(["Testing", "Architecture"])
-        with testtab:
-            dashfunc()
-
-        with archtab:
-            sysarcfunc()
-    if page == PAGES[1]:
+    archtab, testtab, resultstab, issuestab = st.tabs(["Architecture", "Test Schedule", "Test Results", "Warnings/Issues"])
+    with testtab:
+        dashfunc()
+    with archtab:
+        sysarcfunc()
+    with resultstab:
+        dashresults()
+    with issuestab:
         sysissues()
 
-    
     
 if __name__ == "__main__":
     main()
