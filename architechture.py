@@ -82,7 +82,7 @@ def sysarcfunc():
             dot.node(mission)
 
             if pd.notna(env):
-                dot.edge(mission, env, label="has mission")
+                dot.edge(mission, env, label="has environment")
             if pd.notna(entity):
                 dot.edge(env, entity, label="has environment entity")
         st.graphviz_chart(dot, True)
