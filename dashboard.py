@@ -128,6 +128,7 @@ def dashresults():
     with top_columns[0]:
         roles = pd.read_csv("reports/Responsibilities.csv", index_col=0)
         resultsdocument = pd.read_csv("reports/DocumentSearch.csv", index_col=0)
+        verificationcheck = pd.read_csv("reports/Query7_VerificationCheck.csv", index_col=0)
 
         st.markdown("<h6>Assigned Responsibilities</h6>", True)
         st.dataframe(roles,hide_index=True)
@@ -135,7 +136,8 @@ def dashresults():
     with top_columns[1]:
         st.markdown("<h6>Test Data Results</h6>", True)
 
-        metricchoice = st.selectbox("Select Test Data Document", options=["Payload Test Data Report"], index=0)
+        metricchoice = st.selectbox("Select Test Data Document", 
+                                    options=["Payload Test Data Report", "Verification Results"], index=0)
 
         if metricchoice == "Payload Test Data Report":
             metriccols = st.columns([1, 1.5, 1.5], gap="small") 
@@ -144,6 +146,14 @@ def dashresults():
                     value = str(row["Value"]) + " " + str(row["Unit"]) if (pd.isna(row["Unit"]) != True) else str(row["Value"])
                     st.metric(label=row["TestData"], value=value, delta=row["TestDataSubject"], help="Test, followed by result value for given test subject")
 
+        if metricchoice == "Verification Results":
+            verificationcheck["UnitSymb"] = verificationcheck["Unit"].replace({"percentage": "%"})
+            for index,row in verificationcheck.iterrows():
+                value = str(row["Value"]) + " " + str(row["UnitSymb"]) if (pd.isna(row["UnitSymb"]) != True) else str(row["Value"])
+                st.metric(label=row["MissionReqName"], value=value, delta="Minimum Value: " + str(row["MinValue"]) + str(row["UnitSymb"]),
+                          help=f"Test Name: {row['TestName']} \n Test Output: {row['TestOutput']}")
+        
+        
         st.write(
             """
             <style>
@@ -269,33 +279,31 @@ def dashresults():
     heatmap_pivot.mask(heatmap_pivot > 1, 1, inplace=True)
 
     # Create text for each cell
-    decisionreview['Text'] = decisionreview.apply(lambda row: f"Decision: {row['Decision']}<br>Data: {row['Data']}<br>TestData: {row['TestData']}", axis=1)
-    # text_pivot = decisionreview.pivot(index='Milestone', columns='Review', values='Text').fillna('')
-    text_pivot = decisionreview[["Milestone", "Review", "Text"]].pivot_table(index="Milestone", columns="Review", values="Text", aggfunc=lambda x: "|".join(x.astype("str")))
+    # decisionreview['Text'] = decisionreview.apply(lambda row: f"Decision: {row['Decision']}<br>Data: {row['Data']}<br>TestData: {row['TestData']}", axis=1)
+    # text_pivot = decisionreview[["Milestone", "Review", "Text"]].pivot_table(index="Milestone", columns="Review", values="Text", aggfunc=lambda x: "|".join(x.astype("str")))
 
     # Generate the heatmap
-    fig = go.Figure(go.Heatmap(
-        x=heatmap_pivot.columns,
-        y=heatmap_pivot.index,
-        z=heatmap_pivot.values,
-        text=text_pivot.values,
-        texttemplate="%{text}",
-        textfont={"size": 16}
-    ))
+    # fig = go.Figure(go.Heatmap(
+    #     x=heatmap_pivot.columns,
+    #     y=heatmap_pivot.index,
+    #     z=heatmap_pivot.values,
+    #     text=text_pivot.values,
+    #     texttemplate="%{text}",
+    #     textfont={"size": 16}
+    # ))
 
     # st.dataframe(decisionreview.pivot_table(index=['Milestone', "ReviewStart"], columns=['Review'], aggfunc='size', fill_value=None))
     # st.dataframe(heatmap_pivot)
 
 
     # Update layout
-    fig.update_layout(
-        title='Decision Review Data Grid',
-        xaxis_title="Review",
-        yaxis_title="Milestone",
-        plot_bgcolor='white'
-    )
-    st.plotly_chart(fig, True)
-    # st.dataframe(decisionreview)
+    # fig.update_layout(
+    #     title='Decision Review Data Grid',
+    #     xaxis_title="Review",
+    #     yaxis_title="Milestone",
+    #     plot_bgcolor='white'
+    # )
+    # st.plotly_chart(fig, True)
 
 
 
