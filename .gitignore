@@ -2,3 +2,4 @@ omld/
 __pycache__/
 newdash/*
 newdash/
+.streamlit/*
