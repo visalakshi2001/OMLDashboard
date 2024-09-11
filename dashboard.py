@@ -120,20 +120,16 @@ def dashfunc():
 def dashresults():
     st.subheader("Performance", divider="violet")
 
-    top_columns = st.columns([0.2,0.3,0.5])
-
-    with top_columns[2]:
-        issuesinfo()
-
-    with top_columns[0]:
-        roles = pd.read_csv("reports/Responsibilities.csv", index_col=0)
-        resultsdocument = pd.read_csv("reports/DocumentSearch.csv", index_col=0)
-        verificationcheck = pd.read_csv("reports/Query7_VerificationCheck.csv", index_col=0)
-
-        st.markdown("<h6>Assigned Responsibilities</h6>", True)
-        st.dataframe(roles,hide_index=True)
+    top_columns = st.columns([0.4,0.6])
 
     with top_columns[1]:
+        issuesinfo()
+    
+
+    with top_columns[0]:
+        resultsdocument = pd.read_csv("reports/DocumentSearch.csv", index_col=0)
+        verificationcheck = pd.read_csv("reports/Query7_VerificationCheck.csv", index_col=0)
+        
         st.markdown("<h6>Test Data Results</h6>", True)
 
         metricchoice = st.selectbox("Select Test Data Document", 
@@ -230,7 +226,16 @@ def dashresults():
         fig.update_xaxes(showticklabels=False)
         st.plotly_chart(fig, True)
 
-    
+
+
+##########################################################################################################
+# REFERENCES  # 
+#  hover templates: https://plotly.com/python/hover-text-and-formatting/ #
+#  scatterplot annotations: https://stackoverflow.com/questions/71875067/adding-text-labels-to-a-plotly-scatter-plot-for-a-subset-of-points #
+#   #
+##########################################################################################################
+
+def dashreqs():
     decisionreview = pd.read_csv("reports/Query3_Decisions.csv", index_col=0)
     decisionreview['ReviewStart'] = pd.to_datetime(decisionreview['ReviewStart'])
     # Define ReviewEnd as 1 hour after ReviewStart (since no end times are given)
@@ -274,42 +279,3 @@ def dashresults():
     )
     st.plotly_chart(fig, True)
    
-
-    heatmap_pivot = decisionreview.pivot_table(index='Milestone', columns='Review', aggfunc='size', fill_value=None)
-    heatmap_pivot.mask(heatmap_pivot > 1, 1, inplace=True)
-
-    # Create text for each cell
-    # decisionreview['Text'] = decisionreview.apply(lambda row: f"Decision: {row['Decision']}<br>Data: {row['Data']}<br>TestData: {row['TestData']}", axis=1)
-    # text_pivot = decisionreview[["Milestone", "Review", "Text"]].pivot_table(index="Milestone", columns="Review", values="Text", aggfunc=lambda x: "|".join(x.astype("str")))
-
-    # Generate the heatmap
-    # fig = go.Figure(go.Heatmap(
-    #     x=heatmap_pivot.columns,
-    #     y=heatmap_pivot.index,
-    #     z=heatmap_pivot.values,
-    #     text=text_pivot.values,
-    #     texttemplate="%{text}",
-    #     textfont={"size": 16}
-    # ))
-
-    # st.dataframe(decisionreview.pivot_table(index=['Milestone', "ReviewStart"], columns=['Review'], aggfunc='size', fill_value=None))
-    # st.dataframe(heatmap_pivot)
-
-
-    # Update layout
-    # fig.update_layout(
-    #     title='Decision Review Data Grid',
-    #     xaxis_title="Review",
-    #     yaxis_title="Milestone",
-    #     plot_bgcolor='white'
-    # )
-    # st.plotly_chart(fig, True)
-
-
-
-##########################################################################################################
-# REFERENCES  # 
-#  hover templates: https://plotly.com/python/hover-text-and-formatting/ #
-#  scatterplot annotations: https://stackoverflow.com/questions/71875067/adding-text-labels-to-a-plotly-scatter-plot-for-a-subset-of-points #
-#   #
-##########################################################################################################

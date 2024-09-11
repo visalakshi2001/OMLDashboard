@@ -1,26 +1,37 @@
 import streamlit as st
 import pandas as pd
-from dashboard import dashfunc, dashresults
+
+from dashboard import dashfunc, dashresults, dashreqs
 from architechture import sysarcfunc
 from issues import sysissues
+from home import homefunc, progmgmtfunc
 
 
 st.set_page_config(page_title="Dashboard", page_icon="🍩", layout="wide")
 
 
 def main():
-    PAGES = ["📊 Dashboard", "🪧 Issues"]
+    # PAGES = ["📊 Dashboard", "🪧 Issues"]
+    TABS = ["Home", "Program Management", "Requirements",
+             "Architecture", "Test Schedule", "Test Results", "Warnings/Issues"]
 
     st.header("🧮 Dashboard", divider="red")
 
-    archtab, testtab, resultstab, issuestab = st.tabs(["Architecture", "Test Schedule", "Test Results", "Warnings/Issues"])
-    with testtab:
-        dashfunc()
-    with archtab:
+    tabs = st.tabs(TABS)
+
+    with tabs[0]:
+        homefunc()
+    with tabs[1]:
+        progmgmtfunc()
+    with tabs[2]:
+        dashreqs()
+    with tabs[3]:
         sysarcfunc()
-    with resultstab:
+    with tabs[4]:
+        dashfunc()
+    with tabs[5]:
         dashresults()
-    with issuestab:
+    with tabs[6]:
         sysissues()
 
     
