@@ -39,7 +39,7 @@ def progmgmtfunc():
     roles = pd.read_csv("reports/Tasks_Rover.csv", index_col=0)
 
     role_dict = dict(zip(roles["StudentName"].value_counts().index, 
-                         ["Test Engineer (x5)", "Test Engineer (x5)", "Systems Architect", "Program Manager", "MATDEV", "CBTDEV", "CBTDEV"]))
+                         ["Test Engineer", "Test Engineer", "Systems Architect", "Program Manager", "MATDEV", "CBTDEV", "Test Engineer"]))
     roles["Role"] = roles["StudentName"].apply(lambda x: role_dict[x])
 
     with cols[0]:
