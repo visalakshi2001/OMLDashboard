@@ -25,14 +25,14 @@ def homefunc():
         co.markdown("<h5>Task List</h5>", True)
 
     with sections[2]:
-        tc = st.container(border=True)
-        bc = st.container(border=True)
+        tc = st.container(border=True, height=350)
+        bc = st.container(border=True, height=120)
 
         tc.markdown("<h5>Recent Changes</h5>", True)
         bc.markdown("<h5>Warnings Summary</h5>", True)
 
 
 def progmgmtfunc():
-    roles = pd.read_csv("reports/Responsibilities.csv", index_col=0)
+    roles = pd.read_csv("reports/Responsibilities copy.csv", index_col=0)
     st.markdown("<h6>Assigned Responsibilities</h6>", True)
     st.dataframe(roles,hide_index=True)
