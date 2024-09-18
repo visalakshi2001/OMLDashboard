@@ -44,7 +44,7 @@ def progmgmtfunc():
 
     with cols[0]:
         st.markdown("<h6>Assigned Responsibilities</h6>", True)
-        st.dataframe(roles[["StudentName", "Role"]].drop_duplicates(),
+        st.dataframe(roles[["StudentName", "Role"]].drop_duplicates(ignore_index=True),
                      hide_index=True, use_container_width=True)
 
 
