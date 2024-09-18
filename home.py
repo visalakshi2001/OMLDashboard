@@ -33,6 +33,22 @@ def homefunc():
 
 
 def progmgmtfunc():
-    roles = pd.read_csv("reports/Responsibilities copy.csv", index_col=0)
-    st.markdown("<h6>Assigned Responsibilities</h6>", True)
-    st.dataframe(roles,hide_index=True)
+
+    cols = st.columns([0.3, 0.6])
+
+    roles = pd.read_csv("reports/Tasks_Rover.csv", index_col=0)
+
+    role_dict = dict(zip(roles["StudentName"].value_counts().index, 
+                         ["Test Engineer (x5)", "Test Engineer (x5)", "Systems Architect", "Program Manager", "MATDEV", "CBTDEV", "CBTDEV"]))
+    roles["Role"] = roles["StudentName"].apply(lambda x: role_dict[x])
+
+    with cols[0]:
+        st.markdown("<h6>Assigned Responsibilities</h6>", True)
+        st.dataframe(roles[["StudentName", "Role"]].drop_duplicates(),
+                     hide_index=True, use_container_width=True)
+
+
+    with cols[1]:
+        cont = st.container(border=True, height=600)
+        cont.markdown("<h5>Task Overview</h5>", True)
+        cont.dataframe(roles[["StudentName", "Description"]], use_container_width=True)
