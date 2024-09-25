@@ -60,7 +60,9 @@ def sysissues():
                             <li>Test Equipment: LSNDS_ElectricalModel1</li> \
                             <li>Conflict Type: No Environment</li>  \
                             ",True)
+                
 
+# Function to make a issues widget that can create a brief of issues on other pages
 def issuesinfo():
     st.markdown("<h6>Issues</h6>", True)
     with st.container(border=True, height=150):
