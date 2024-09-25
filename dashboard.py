@@ -11,10 +11,6 @@ from issues import issuesinfo
 COLORS = px.colors.qualitative.Plotly
 
 
-def set_datewise_color(df):
-    df["color"] = df['datetime'].duplicated(keep=False).map({True: '#ff4b4b', False: 'royalblue'})
-
-    return df
 
 def dashschedule():
 

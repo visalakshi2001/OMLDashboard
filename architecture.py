@@ -1,37 +1,30 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-from streamlit_echarts import st_echarts
-import plotly.express as px
-import plotly.graph_objects as go
-import itertools
 
+# for making UML diagrams
 import graphviz
 
 
-# seperate the relationship arrows by type or color
-# hide detectfault
-# python script checks the test conflicts and other conflicts
-
+# ########## ARCHITECTURE VIEW FUNCTION
 def sysarcfunc():
-
-    # top_cols = st.columns([2.5,1.5])
-
-    # with top_cols[0]:
-    # systemarc_sankey("System Architechture")
+    # read the data for the architecture
     function = pd.read_csv("reports/FunctionalArchitecture.csv", index_col=0)
     system = pd.read_csv("reports/Query2_SystemArchitecture.csv", index_col=0)
     environment = pd.read_csv("reports/Environment.csv", index_col=0)
     mission = pd.read_csv("reports/Query1_MissionArchitecture 1.csv", index_col=0)
     moe = pd.read_csv("reports/Query4_MOEs.csv", index_col=0)
 
+    # Make a dropdown selection menu, with a title, and list of options. 
+    # this component returns the variable that is selected
     graphchoice = st.selectbox("Select view", ["Functional Architechture", "System Architechture", "Missions",
-                                                            "MOE", "Environments"],
-                                index=0)
+                                                            "MOE", "Environments"], index=0)
 
+    # initiate a empty diagraph
     dot = graphviz.Digraph(comment='Hierarchy', strict=True)
     
+    # take each option, and design the graph, if the option is selected
     if graphchoice == "Functional Architechture":
+        # make the graph
         for index, row in function.iterrows():
             func = row['Function']
             super_func = row['SuperFunction']
@@ -49,6 +42,8 @@ def sysarcfunc():
                 if allocated_to not in dot.body:
                     dot.node(allocated_to, shape='box')
                 dot.edge(func, allocated_to, label="function allocated to")
+        
+        # call the diagraph chart using streamlit component
         st.graphviz_chart(dot, True)
     
     elif graphchoice == "System Architechture":
@@ -120,7 +115,6 @@ def sysarcfunc():
                 dot.edge(missname, moename, label="has moe")
         st.graphviz_chart(dot, True)
     
-    # st.dataframe(moe)
 
 
 

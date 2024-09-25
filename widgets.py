@@ -1,7 +1,10 @@
 import streamlit as st
+# library for creating calendar widget
 from streamlit_calendar import calendar
 import pandas as pd
 
+# this code comes from the documentation
+# https://github.com/im-perativa/streamlit-calendar
 
 def make_calendar(view="dayGridDay", static=False):
     calendar_options = {
