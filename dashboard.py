@@ -11,25 +11,30 @@ from issues import issuesinfo
 COLORS = px.colors.qualitative.Plotly
 
 
-
+# ########## TEST SCHEDULE VIEW FUNCTION
 def dashschedule():
-
+    # Make a heading of size H2
     st.subheader("Schedule", divider="orange")
 
+    # create two columns of equal size
     top_columns = st.columns(2)
 
+    # call the first column and design the view under
     with top_columns[0]:
+        # this column will hold the number of tests scheduled, read data for test programs
         programs = pd.read_csv("reports/TestPrograms.csv", index_col=0)
 
         st.markdown("<h6>Scheduled Test Programs</h6>", True)
+        # make 4 sub-columns and display the data using col.metric()
         metriccols = st.columns(4)
         for i,num in enumerate(programs["num_Tests"]):
             metriccols[i].metric(label=programs.iloc[i]["TestProgram"], value=num, delta=f"{num-2} Scheduled")
 
+    # call the second column and insert the issues section
     with top_columns[1]:
         issuesinfo()
             
-
+    # read the data for test schedule
     testscheduling = pd.read_csv("reports/Query6_Scheduling 2.csv", index_col=0)
     testscheduling["Start"] = pd.to_datetime(testscheduling["Start"])
     testscheduling["End"] = pd.to_datetime(testscheduling["End"])
@@ -37,7 +42,7 @@ def dashschedule():
     # Define a function to extract the week of year
     testscheduling['Week'] = testscheduling['Start'].dt.strftime('%Y-W%U')
 
-    # Creating the Plotly figure
+    # Creating the Plotly figure for timeline chart of test schedule
     fig = px.timeline(testscheduling, x_start="Start", x_end="End", y="Site", color="VMName", text="VMName", hover_name="VM",
                     category_orders={"Site": sorted(testscheduling['Site'].unique(), key=lambda x: str(x))})
 
@@ -45,6 +50,7 @@ def dashschedule():
     # Update layout to include a dropdown menu for week selection
     week_options = testscheduling['Week'].unique()
 
+    # update the layout with options menu, time-axis scale, etc.
     fig.update_layout(
         title="Test Site Schedule",
         xaxis_title="Time",
@@ -75,12 +81,13 @@ def dashschedule():
     )
     vlinedate = datetime.today().date()
     fig.add_vline(x=datetime(vlinedate.year, vlinedate.month, vlinedate.day).timestamp() * 1000, annotation_text= f"today {vlinedate.month}/{vlinedate.day}")
+    
+    # insert the figure in the view using streamlit
     st.plotly_chart(fig, use_container_width=True)
 
     
 
-        
-
+# ########## TEST SCHEDULE VIEW FUNCTION
 def dashresults():
     st.subheader("Performance", divider="violet")
 
