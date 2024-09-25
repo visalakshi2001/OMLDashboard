@@ -16,7 +16,7 @@ def set_datewise_color(df):
 
     return df
 
-def dashfunc():
+def dashschedule():
 
     st.subheader("Schedule", divider="orange")
 
@@ -34,88 +34,56 @@ def dashfunc():
         issuesinfo()
             
 
-    middle_columns = st.columns([0.75, 0.25])
-    with middle_columns[0]:
-        testscheduling = pd.read_csv("reports/Query6_Scheduling 2.csv", index_col=0)
-        testscheduling["Start"] = pd.to_datetime(testscheduling["Start"])
-        testscheduling["End"] = pd.to_datetime(testscheduling["End"])
+    testscheduling = pd.read_csv("reports/Query6_Scheduling 2.csv", index_col=0)
+    testscheduling["Start"] = pd.to_datetime(testscheduling["Start"])
+    testscheduling["End"] = pd.to_datetime(testscheduling["End"])
 
-        # Define a function to extract the week of year
-        testscheduling['Week'] = testscheduling['Start'].dt.strftime('%Y-W%U')
+    # Define a function to extract the week of year
+    testscheduling['Week'] = testscheduling['Start'].dt.strftime('%Y-W%U')
 
-        # Creating the Plotly figure
-        fig = px.timeline(testscheduling, x_start="Start", x_end="End", y="Site", color="VMName", text="VMName", hover_name="VM",
-                        category_orders={"Site": sorted(testscheduling['Site'].unique(), key=lambda x: str(x))})
+    # Creating the Plotly figure
+    fig = px.timeline(testscheduling, x_start="Start", x_end="End", y="Site", color="VMName", text="VMName", hover_name="VM",
+                    category_orders={"Site": sorted(testscheduling['Site'].unique(), key=lambda x: str(x))})
 
-        
-        # Update layout to include a dropdown menu for week selection
-        week_options = testscheduling['Week'].unique()
-
-        fig.update_layout(
-            title="Test Site Schedule",
-            xaxis_title="Time",
-            yaxis_title="Test Site",
-            xaxis=dict(
-                tickformat="%d %b %Y\n%H:%M",
-                range=[testscheduling['Start'].min() - pd.Timedelta(days=1), testscheduling['End'].min() + pd.Timedelta(days=6)],
-            ),
-            updatemenus=[{
-                "buttons": [
-                    {
-                        "args": [
-                            {"xaxis.range": [testscheduling[testscheduling['Week'] == week]['Start'].min(), testscheduling[testscheduling['Week'] == week]['End'].max()]}
-                        ],
-                        "label": week,
-                        "method": "relayout"
-                    }
-                    for week in week_options
-                ],
-                "direction": "down",
-                "showactive": True,
-                "x": 0.17,
-                "xanchor": "left",
-                "y": 1.15,
-                "yanchor": "top"
-            }],
-            legend=dict(xanchor="left", x=0, y=1, yanchor="bottom", orientation="h")
-        )
-        vlinedate = datetime.today().date()
-        fig.add_vline(x=datetime(vlinedate.year, vlinedate.month, vlinedate.day).timestamp() * 1000, annotation_text= f"today {vlinedate.month}/{vlinedate.day}")
-        st.plotly_chart(fig, use_container_width=True)
-        # st.write("Add test subjects to the labels on the graph")
-        # st.write("Raise issues when conflicting")
     
-    with middle_columns[1]:
-        tests = pd.read_csv("reports/TestProcedures.csv", index_col=0)
-        st.markdown(
-            """
-            <style>
-                .stProgress > div > div > div > div  {
-                    background-color: #ff4b4b;
+    # Update layout to include a dropdown menu for week selection
+    week_options = testscheduling['Week'].unique()
+
+    fig.update_layout(
+        title="Test Site Schedule",
+        xaxis_title="Time",
+        yaxis_title="Test Site",
+        xaxis=dict(
+            tickformat="%d %b %Y\n%H:%M",
+            range=[testscheduling['Start'].min() - pd.Timedelta(days=1), testscheduling['End'].min() + pd.Timedelta(days=6)],
+        ),
+        updatemenus=[{
+            "buttons": [
+                {
+                    "args": [
+                        {"xaxis.range": [testscheduling[testscheduling['Week'] == week]['Start'].min(), testscheduling[testscheduling['Week'] == week]['End'].max()]}
+                    ],
+                    "label": week,
+                    "method": "relayout"
                 }
+                for week in week_options
+            ],
+            "direction": "down",
+            "showactive": True,
+            "x": 0.17,
+            "xanchor": "left",
+            "y": 1.15,
+            "yanchor": "top"
+        }],
+        legend=dict(xanchor="left", x=0, y=1, yanchor="bottom", orientation="h")
+    )
+    vlinedate = datetime.today().date()
+    fig.add_vline(x=datetime(vlinedate.year, vlinedate.month, vlinedate.day).timestamp() * 1000, annotation_text= f"today {vlinedate.month}/{vlinedate.day}")
+    st.plotly_chart(fig, use_container_width=True)
 
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
-        tests["TestConf"] = [0.374540, 0.950714, 0.731994, 0.598658, 0.156019, 0.155995]
+    
 
-        st.markdown("<h6>Test Confidence Scores</h6>", True)
-
-        for i, score in enumerate(tests["TestConf"]):
-            st.progress(value=score, text=tests.iloc[i]["Test"] + f"$~~~~~~~~~~~$ **{np.round(score*100, decimals=1)}%**")
         
-        # st.dataframe(tests[["Test", "TestConf"]], 
-        #              column_config = { "TestConf":
-        #                  st.column_config.ProgressColumn("Test Confidence Scores", 
-        #                                                  help="Confidence scores for the scheduled tests", min_value=0.0, max_value=1.0,
-        #                                                  width="large"
-        #                                                  )
-        #                 },
-        #              hide_index=True,
-        #              use_container_width=True,                     
-        #             )
-
 
 def dashresults():
     st.subheader("Performance", divider="violet")

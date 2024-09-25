@@ -39,12 +39,12 @@ def progmgmtfunc():
     roles = pd.read_csv("reports/Tasks_Rover.csv", index_col=0)
 
     role_dict = dict(zip(roles["StudentName"].value_counts().index, 
-                         ["Test Engineer", "Test Engineer", "Systems Architect", "Program Manager", "MATDEV", "CBTDEV", "Test Engineer"]))
+                         ["Test Engineer", "Test Engineer", "Systems Architect", "Program Manager", "Software Engineer", "CBTDEV", "Test Engineer"]))
     roles["Role"] = roles["StudentName"].apply(lambda x: role_dict[x])
 
     with cols[0]:
         st.markdown("<h6>Assigned Responsibilities</h6>", True)
-        st.dataframe(roles[["StudentName", "Role"]].drop_duplicates(ignore_index=True),
+        st.dataframe(roles[["StudentName", "Role"]].drop_duplicates(ignore_index=True).reset_index(drop=True),
                      hide_index=True, use_container_width=True)
 
 
