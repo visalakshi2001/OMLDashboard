@@ -30,7 +30,7 @@ def dashschedule():
         for i,num in enumerate(programs["num_Tests"]):
             metriccols[i].metric(label=programs.iloc[i]["TestProgram"], value=num, delta=f"{num-2} Scheduled")
 
-    # call the second column and insert the issues section
+    # call the second column and insert the issues section from issues.py
     with top_columns[1]:
         issuesinfo()
             
@@ -89,14 +89,17 @@ def dashschedule():
 
 # ########## TEST SCHEDULE VIEW FUNCTION
 def dashresults():
+    # create a heading of size H2
     st.subheader("Performance", divider="violet")
 
+    # create two columns of sizes 40% and 60%
     top_columns = st.columns([0.4,0.6])
 
+    # call the second column and insert the issues section from issues.py
     with top_columns[1]:
         issuesinfo()
     
-
+    # call the first column and design the view under
     with top_columns[0]:
         resultsdocument = pd.read_csv("reports/DocumentSearch.csv", index_col=0)
         verificationcheck = pd.read_csv("reports/Query7_VerificationCheck.csv", index_col=0)
@@ -169,11 +172,7 @@ def dashresults():
                 textposition="top center",
                 hovertemplate=f" <b> Satisfied by:</b> {keycaprates['SatisfiedBy'][i]}" + ""
             ))
-            # fig.add_annotation(x=keycaprates["Threshold"][i], y=keycaprates["KCName"][i], text=keycaprates["Threshold"][i].astype(str), 
-            #                    yshift=10, showarrow=False)
-            # fig.add_annotation(x=keycaprates["Objective"][i], y=keycaprates["KCName"][i], text=keycaprates["Objective"][i].astype(str), 
-            #                    yshift=10, showarrow=False)
-        
+
         fig.update_layout(title="Threshold vs Objective for Each Key Capacities",
                             xaxis_title="Value",
                             yaxis_title="KCName",
@@ -203,9 +202,9 @@ def dashresults():
 # REFERENCES  # 
 #  hover templates: https://plotly.com/python/hover-text-and-formatting/ #
 #  scatterplot annotations: https://stackoverflow.com/questions/71875067/adding-text-labels-to-a-plotly-scatter-plot-for-a-subset-of-points #
-#   #
 ##########################################################################################################
 
+# ########## REQUIREMENTS VIEW FUNCTION
 def dashreqs():
     decisionreview = pd.read_csv("reports/Query3_Decisions.csv", index_col=0)
     decisionreview['ReviewStart'] = pd.to_datetime(decisionreview['ReviewStart'])
@@ -225,10 +224,7 @@ def dashreqs():
         title="Review Schedule",
         xaxis_title="Time",
         yaxis_title="Review",
-        # xaxis=dict(
-        #     tickformat="%d %b %Y\n%H:%M",
-        #     # range=[decisionreview['ReviewStart'].min() - pd.Timedelta(days=1), decisionreview['ReviewEnd'].min() + pd.Timedelta(days=6)],
-        # ),
+
         updatemenus=[{
             "buttons": [
                 {
@@ -248,5 +244,6 @@ def dashreqs():
             "yanchor": "top"
         }]
     )
+    # insert the created figure in the UI 
     st.plotly_chart(fig, True)
    

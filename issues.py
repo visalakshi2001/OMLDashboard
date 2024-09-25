@@ -1,18 +1,17 @@
 import streamlit as st
 
-# hyperlink that shows issues from the issues graph
-# warning that requirements have not been verified (green) or failed (red)
-# test schedules, if not scheduled in metrics and warning that tests have not been scheduled
-# changes needed in confidence values
-
+# ########## ISSUES VIEW FUNCTION
 def sysissues():
-
-
+    # create three columns of equal size
     top_cols = st.columns(3)
 
+    # with the first column, create content for all the scheduling conflicts
     with top_cols[0]:
+        # create an accordion expander using st.expander. this will contain all details of the conflict issues
         conflicts = st.expander("⚠️ Four tests have overlapping schedule", expanded=True)
 
+        # call the expander and create containers for each occurring conflict.
+        # this needs to be updated to a controlled loop, getting data from the OML query data
         with conflicts:
             with st.container(border=True):
                 st.error("Pathway Creation Time Test has potential schedule conflict with other tests", icon="❗")
