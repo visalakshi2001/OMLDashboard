@@ -34,7 +34,7 @@ def homefunc():
     # call the third container and design the view under
     with sections[2]:
         tc = st.container(border=True, height=350)
-        bc = st.container(border=True, height=120)
+        # bc = st.container(border=True, height=120)
 
         tc.markdown("<h5>Recent Changes</h5>", True)
         bc.markdown("<h5>Warnings Summary</h5>", True)
