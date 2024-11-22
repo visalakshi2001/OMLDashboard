@@ -22,20 +22,29 @@ def dashschedule():
     # call the first column and design the view under
     with top_columns[0]:
         # this column will hold the number of tests scheduled, read data for test programs
-        programs = pd.read_csv("reports/TestPrograms.csv", index_col=0)
+        # programs = pd.read_csv("reports/TestPrograms.csv", index_col=0)
+        testscheduling = pd.read_csv("reports/Query6_Scheduling 2 copy.csv", index_col=0)
 
-        st.markdown("<h6>Scheduled Test Programs</h6>", True)
+        st.markdown("<h6>Scheduled Test Metrics</h6>", True)
+        numTests = sum(pd.notnull(testscheduling['Site']))
+        totalTests = len(testscheduling['Site'])
+        metriccols = st.columns(3)
+        metriccols[0].metric(label="Scheduled Test Count", value=numTests, delta=f'Total Tests: {totalTests}')
+
+        upcomingTests = np.asarray(np.where(pd.to_datetime(testscheduling['Start']).dt.date >= datetime.today().date())).size
+        metriccols[1].metric(label="Upcoming Tests Count", value=upcomingTests, delta=f'Total Tests: {totalTests}')
+
+
         # make 4 sub-columns and display the data using col.metric()
-        metriccols = st.columns(4)
-        for i,num in enumerate(programs["num_Tests"]):
-            metriccols[i].metric(label=programs.iloc[i]["TestProgram"], value=num, delta=f"{num-2} Scheduled")
+        # for i,num in enumerate(testscheduling["num_Tests"]):
+        #     metriccols[i].metric(label=programs.iloc[i]["TestProgram"], value=num, delta=f"{num-2} Scheduled")
 
     # call the second column and insert the issues section from issues.py
     with top_columns[1]:
         issuesinfo()
             
     # read the data for test schedule
-    testscheduling = pd.read_csv("reports/Query6_Scheduling 2.csv", index_col=0)
+    testscheduling = pd.read_csv("reports/Query6_Scheduling 2 copy.csv", index_col=0)
     testscheduling["Start"] = pd.to_datetime(testscheduling["Start"])
     testscheduling["End"] = pd.to_datetime(testscheduling["End"])
 
@@ -59,25 +68,25 @@ def dashschedule():
             tickformat="%d %b %Y\n%H:%M",
             range=[testscheduling['Start'].min() - pd.Timedelta(days=1), testscheduling['End'].min() + pd.Timedelta(days=6)],
         ),
-        updatemenus=[{
-            "buttons": [
-                {
-                    "args": [
-                        {"xaxis.range": [testscheduling[testscheduling['Week'] == week]['Start'].min(), testscheduling[testscheduling['Week'] == week]['End'].max()]}
-                    ],
-                    "label": week,
-                    "method": "relayout"
-                }
-                for week in week_options
-            ],
-            "direction": "down",
-            "showactive": True,
-            "x": 0.17,
-            "xanchor": "left",
-            "y": 1.15,
-            "yanchor": "top"
-        }],
-        legend=dict(xanchor="left", x=0, y=1, yanchor="bottom", orientation="h")
+        # updatemenus=[{
+        #     "buttons": [
+        #         {
+        #             "args": [
+        #                 {"xaxis.range": [testscheduling[testscheduling['Week'] == week]['Start'].min(), testscheduling[testscheduling['Week'] == week]['End'].max()]}
+        #             ],
+        #             "label": week,
+        #             "method": "relayout"
+        #         }
+        #         for week in week_options
+        #     ],
+        #     "direction": "down",
+        #     "showactive": True,
+        #     "x": 0.17,
+        #     "xanchor": "left",
+        #     "y": 1.15,
+        #     "yanchor": "top"
+        # }],
+        legend=dict(xanchor="left", x=0, y=-0.5, yanchor="bottom", orientation="h")
     )
     vlinedate = datetime.today().date()
     fig.add_vline(x=datetime(vlinedate.year, vlinedate.month, vlinedate.day).timestamp() * 1000, annotation_text= f"today {vlinedate.month}/{vlinedate.day}")
