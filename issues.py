@@ -63,7 +63,13 @@ def sysissues():
                 
 
 # Function to make a issues widget that can create a brief of issues on other pages
-def issuesinfo():
+def issuesinfo(height, ):
     st.markdown("<h6>Issues</h6>", True)
-    with st.container(border=True, height=150):
+    with st.container(border=True, height=height):
         st.warning('Four tests have overlapped scheduling (find more info on Issues tab)', icon="⚠️")
+
+        st.error("Electrical Test has potential schedule conflict with other tests", icon="❗")
+        st.error("Path Accuracy Test has potential schedule conflict with other tests", icon="❗")
+
+        st.error("Maneuverability Test has potential schedule conflict with other tests", icon="❗")
+        st.error("Pathway Creation Time Test has potential schedule conflict with other tests", icon="❗")

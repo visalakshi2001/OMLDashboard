@@ -17,7 +17,7 @@ def dashschedule():
     st.subheader("Schedule", divider="orange")
 
     # create two columns of equal size
-    top_columns = st.columns(2)
+    top_columns = st.columns([0.7,0.3])
 
     # call the first column and design the view under
     with top_columns[0]:
@@ -28,20 +28,23 @@ def dashschedule():
         st.markdown("<h6>Scheduled Test Metrics</h6>", True)
         numTests = sum(pd.notnull(testscheduling['Site']))
         totalTests = len(testscheduling['Site'])
+        unscheduledTests = totalTests - numTests
         metriccols = st.columns(3)
-        metriccols[0].metric(label="Scheduled Test Count", value=numTests, delta=f'Total Tests: {totalTests}')
+        metriccols[0].metric(label="Unscheduled Test Count", value=unscheduledTests, delta=f'Total Tests: {totalTests}')
 
         upcomingTests = np.asarray(np.where(pd.to_datetime(testscheduling['Start']).dt.date >= datetime.today().date())).size
         metriccols[1].metric(label="Upcoming Tests Count", value=upcomingTests, delta=f'Total Tests: {totalTests}')
 
+        metriccols[2].metric(label="Successful Test Count", value=2, delta=f'Completed Tests: {totalTests-unscheduledTests-upcomingTests}')
 
+        st.write('---')
         # make 4 sub-columns and display the data using col.metric()
         # for i,num in enumerate(testscheduling["num_Tests"]):
         #     metriccols[i].metric(label=programs.iloc[i]["TestProgram"], value=num, delta=f"{num-2} Scheduled")
 
     # call the second column and insert the issues section from issues.py
     with top_columns[1]:
-        issuesinfo()
+        issuesinfo(500)
             
     # read the data for test schedule
     testscheduling = pd.read_csv("reports/Query6_Scheduling 2 copy.csv", index_col=0)
@@ -61,7 +64,7 @@ def dashschedule():
 
     # update the layout with options menu, time-axis scale, etc.
     fig.update_layout(
-        title="Test Site Schedule",
+        title="Test Schedule",
         xaxis_title="Time",
         yaxis_title="Test Site",
         xaxis=dict(
@@ -86,13 +89,13 @@ def dashschedule():
         #     "y": 1.15,
         #     "yanchor": "top"
         # }],
-        legend=dict(xanchor="left", x=0, y=-0.5, yanchor="bottom", orientation="h")
+        legend=dict(xanchor="left", x=0, y=-0.5, yanchor="bottom", orientation="h"),
     )
     vlinedate = datetime.today().date()
     fig.add_vline(x=datetime(vlinedate.year, vlinedate.month, vlinedate.day).timestamp() * 1000, annotation_text= f"today {vlinedate.month}/{vlinedate.day}")
     
     # insert the figure in the view using streamlit
-    st.plotly_chart(fig, use_container_width=True)
+    top_columns[0].plotly_chart(fig, use_container_width=True)
 
     
 
@@ -106,7 +109,7 @@ def dashresults():
 
     # call the second column and insert the issues section from issues.py
     with top_columns[1]:
-        issuesinfo()
+        issuesinfo(150)
     
     # call the first column and design the view under
     with top_columns[0]:
